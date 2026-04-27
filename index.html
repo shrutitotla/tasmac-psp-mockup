@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TASMAC Sticker PSP Portal — Redesign</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;font-size:14px;background:#F6F6F6;color:#101828}
+
+/* ── Layout shell ── */
+.app{display:flex;min-height:100vh}
+.sidebar{width:82px;background:#1D2939;display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:20px;flex-shrink:0}
+.sidebar-icon{width:40px;height:40px;border-radius:10px;background:#344054;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#98A2B3;font-size:18px}
+.sidebar-icon.active{background:#004EEB;color:#fff}
+.main-content{flex:1;overflow:hidden}
+
+/* ── Top nav ── */
+.topnav{height:72px;background:#FAFBFF;border-bottom:1px solid #EAECF0;display:flex;align-items:center;padding:0 24px;gap:12px;justify-content:space-between}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:#667085}
+.breadcrumb a{color:#004EEB;font-weight:500;cursor:pointer;text-decoration:none}
+.breadcrumb span{color:#98A2B3}
+.topnav-right{display:flex;align-items:center;gap:12px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#004EEB;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600}
+
+/* ── Page wrapper ── */
+.page{padding:20px 24px}
+.page-title{font-size:24px;font-weight:600;color:#101828;margin-bottom:2px}
+.page-sub{font-size:14px;font-weight:400;color:#667085;margin-bottom:20px}
+
+/* ── Screen switcher ── */
+.screen-switcher{display:flex;gap:10px;margin-bottom:24px}
+.screen-btn{padding:7px 16px;border-radius:8px;border:1px solid #D0D5DD;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#344054;transition:all .15s}
+.screen-btn.active{background:#004EEB;color:#fff;border-color:#004EEB}
+
+/* ── Screen ── */
+.screen{display:none}
+.screen.active{display:block}
+
+/* ══════════════════════════════════════
+   SCREEN 1: DEMAND LIST
+══════════════════════════════════════ */
+.card{background:#fff;border:1px solid #EAECF0;border-radius:12px;overflow:hidden;box-shadow:0px 1px 2px 0px rgba(16,24,40,0.05)}
+.card-header{padding:16px 20px;border-bottom:1px solid #EAECF0;display:flex;justify-content:space-between;align-items:center}
+.card-title{font-size:15px;font-weight:700}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid #EAECF0;padding:0 20px;background:#fff}
+.tab{padding:12px 0;margin-right:24px;font-size:13px;font-weight:500;color:#667085;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:color .15s}
+.tab.active{color:#004EEB;border-bottom-color:#004EEB;font-weight:600}
+.tab-badge{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:600;background:#F2F4F7;color:#475467;border:1px solid #D0D5DD}
+.tab.active .tab-badge{background:#EFF8FF;color:#004EEB;border-color:#B2DDFF}
+
+/* Table */
+table{width:100%;border-collapse:collapse}
+thead tr{background:#F2F4F7}
+th{padding:0 16px;font-size:12px;font-weight:500;color:#475467;text-align:left;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;border-bottom:1px solid #EAECF0;height:44px}
+td{padding:6px 16px;font-size:14px;color:#344054;border-bottom:1px solid #EAECF0;height:60px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#FCF3DF;cursor:pointer}
+.link{color:#004EEB;font-weight:600;cursor:pointer}
+.link:hover{text-decoration:underline}
+
+/* Funnel mini bar inside table row */
+.mini-funnel{display:flex;align-items:center;gap:0}
+.mf-seg{height:6px;border-radius:0;flex:1;background:#EAECF0;position:relative;overflow:hidden}
+.mf-seg:first-child{border-radius:999px 0 0 999px}
+.mf-seg:last-child{border-radius:0 999px 999px 0}
+.mf-fill{height:100%;border-radius:inherit;transition:width .3s}
+.mf-fill.printed{background:#004EEB}
+.mf-fill.verified{background:#6172F3}
+.mf-fill.packed{background:#F59E0B}
+.mf-fill.dispatched{background:#059669}
+
+/* QR qty cell */
+.qr-col{font-weight:600;font-variant-numeric:tabular-nums}
+.qr-sub{font-size:11px;color:#667085;font-weight:400}
+
+/* Actions bar */
+.actbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid #EAECF0}
+.actbar-left{font-size:13px;color:#667085}
+.actbar-right{display:flex;gap:8px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;height:44px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;white-space:nowrap;transition:opacity .15s,background .15s;gap:5px;text-transform:capitalize}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:#004EEB;color:#fff}
+.btn-primary:hover:not(:disabled){background:#155EEF}
+.btn-outlined{background:#fff;color:#344054;border:1px solid #D0D5DD}
+.btn-outlined:hover:not(:disabled){background:#F9FAFB}
+.btn-sm{height:36px;padding:0 12px;font-size:12px}
+
+/* Search + filter bar */
+.filter-bar{display:flex;gap:10px;padding:14px 20px;border-bottom:1px solid #EAECF0;background:#fff}
+.search-box{display:flex;align-items:center;gap:6px;border:1px solid #D0D5DD;border-radius:8px;padding:0 10px;height:44px;width:220px;font-size:13px;color:#667085;box-shadow:0px 1px 2px 0px rgba(16,24,40,0.05)}
+.search-box input{border:none;outline:none;width:100%;font-size:12px;color:#344054;font-family:inherit}
+
+/* ══════════════════════════════════════
+   SCREEN 2: WORK ORDER DETAIL
+══════════════════════════════════════ */
+.wo-header{background:#fff;border:1px solid #EAECF0;border-radius:12px;margin-bottom:16px;overflow:hidden}
+.wo-topbar{padding:14px 20px;border-bottom:1px solid #EAECF0;display:flex;align-items:center;gap:12px}
+.back-btn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#667085;cursor:pointer;padding:6px 10px;border-radius:6px;border:1px solid #D0D5DD;background:#fff;transition:all .15s}
+.back-btn:hover{background:#F9FAFB}
+.wo-id{font-size:17px;font-weight:700;color:#101828}
+.wo-meta{font-size:12px;color:#667085;margin-left:2px}
+.wo-tags{display:flex;gap:6px;margin-left:auto}
+
+/* QR Funnel strip */
+.qr-funnel{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #EAECF0}
+.funnel-step{padding:16px 20px;border-right:1px solid #EAECF0;position:relative}
+.funnel-step:last-child{border-right:none}
+.funnel-step::after{content:'›';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:#D0D5DD;font-size:18px;z-index:1}
+.funnel-step:last-child::after{display:none}
+.fs-label{font-size:10px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.fs-value{font-size:22px;font-weight:700;color:#101828;font-variant-numeric:tabular-nums;line-height:1}
+.fs-sub{font-size:11px;color:#667085;margin-top:4px}
+.fs-bar{height:4px;border-radius:999px;background:#EAECF0;margin-top:8px;overflow:hidden}
+.fs-bar-fill{height:100%;border-radius:999px;transition:width .5s ease}
+.fill-ordered{background:#101828;width:100%}
+.fill-printed{background:#004EEB}
+.fill-verified{background:#6172F3}
+.fill-packed{background:#F59E0B}
+.fill-dispatched{background:#059669}
+
+/* Print Jobs card */
+.pj-card{background:#fff;border:1px solid #EAECF0;border-radius:12px;overflow:hidden}
+.pj-tabs{display:flex;border-bottom:1px solid #EAECF0;padding:0 20px}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap}
+.chip-blue{background:#EFF8FF;color:#004EEB;border:1px solid #B2DDFF}
+.chip-success{background:#ECFDF3;color:#059669;border:1px solid #ABEFC6}
+.chip-warning{background:#FEDF89;color:#B54708}
+.chip-error{background:#FEF2F2;color:#DC2626}
+.chip-neutral{background:#F2F4F7;color:#475467;border:1px solid #D0D5DD}
+.chip-purple{background:#F5F3FF;color:#6941C6;border:1px solid #D9D6FE}
+.chip-orange{background:#FFF4ED;color:#C4320A;border:1px solid #F9DBAF}
+.chip-pending{background:#F0F5FF;color:#004EEB;border:1px solid #B2DDFF}
+
+/* Inline batch/dispatch reference */
+.ref-id{display:inline-flex;align-items:center;gap:4px;background:#F9FAFB;border:1px solid #EAECF0;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#344054;cursor:pointer}
+.ref-id:hover{border-color:#004EEB;color:#004EEB;background:#EFF8FF}
+.ref-dash{color:#98A2B3;font-size:12px}
+
+/* Expand row */
+.chev{font-size:15px;color:#98A2B3;cursor:pointer;transition:transform .2s;display:inline-block;user-select:none}
+.chev.open{transform:rotate(90deg)}
+.exp-row td{padding:0;border-bottom:1px solid #EAECF0}
+.exp-content{padding:14px 20px 16px 52px;background:#FAFBFF;border-top:1px solid #EEF2FF}
+
+/* Timeline dots */
+.pj-lifecycle{display:flex;align-items:center;gap:0;width:100%}
+.lifecycle-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative}
+.lifecycle-step:not(:last-child)::after{content:'';position:absolute;top:9px;left:calc(50% + 10px);right:calc(-50% + 10px);height:2px;background:#EAECF0;z-index:0}
+.lifecycle-step.done:not(:last-child)::after{background:#004EEB}
+.lifecycle-dot{width:20px;height:20px;border-radius:50%;border:2px solid #EAECF0;background:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#98A2B3;z-index:1;flex-shrink:0}
+.lifecycle-step.done .lifecycle-dot{border-color:#004EEB;background:#004EEB;color:#fff}
+.lifecycle-step.current .lifecycle-dot{border-color:#F59E0B;background:#FFFAEB;color:#B54708;animation:pulse 1.5s infinite}
+.lifecycle-step.blocked .lifecycle-dot{border-color:#D92D20;background:#FEF2F2;color:#D92D20}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.3)}50%{box-shadow:0 0 0 5px rgba(245,158,11,0)}}
+.lifecycle-label{font-size:9px;font-weight:500;color:#667085;margin-top:5px;text-align:center;white-space:nowrap}
+.lifecycle-step.done .lifecycle-label{color:#004EEB}
+.lifecycle-step.current .lifecycle-label{color:#B54708}
+.lifecycle-step.blocked .lifecycle-label{color:#D92D20}
+.lifecycle-value{font-size:10px;font-weight:600;color:#344054;margin-top:2px;text-align:center}
+
+/* Batch detail panel inside expand */
+.batch-ref-block{background:#fff;border:1px solid #EAECF0;border-radius:8px;padding:12px 14px;display:inline-flex;flex-direction:column;gap:3px;min-width:180px}
+.batch-ref-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#475467}
+.batch-ref-val{font-size:13px;font-weight:600;color:#004EEB;cursor:pointer}
+.batch-ref-val:hover{text-decoration:underline}
+.batch-ref-meta{font-size:11px;color:#667085}
+
+/* Section header */
+.section-hd{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #EAECF0}
+.section-title{font-size:13px;font-weight:700;color:#101828}
+.section-meta{font-size:12px;color:#667085}
+
+/* Summary cards row */
+.summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 20px;border-bottom:1px solid #EAECF0;background:#FAFAFA}
+.sum-card{background:#fff;border:1px solid #EAECF0;border-radius:8px;padding:12px 14px}
+.sum-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#667085;margin-bottom:5px}
+.sum-val{font-size:18px;font-weight:700;color:#101828}
+.sum-sub{font-size:11px;color:#667085;margin-top:2px}
+
+/* Alert inline */
+.inline-alert{border-radius:6px;padding:8px 12px;font-size:12px;display:flex;gap:6px;align-items:flex-start;line-height:1.5}
+.al-warn{background:#FFFAEB;border:1px solid #FEDF89;color:#B54708}
+.al-ok{background:#ECFDF3;border:1px solid #ABEFC6;color:#067647}
+.al-err{background:#FEF2F2;border:1px solid #FECACA;color:#D92D20}
+.al-neu{background:#F2F4F7;border:1px solid #D0D5DD;color:#475467}
+
+/* Empty state */
+.empty{padding:48px 24px;text-align:center;color:#667085}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-title{font-size:14px;font-weight:600;color:#344054;margin-bottom:4px}
+.empty-sub{font-size:12px}
+
+/* Tooltip */
+.tooltip-wrap{position:relative;display:inline-block}
+.tooltip-tip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#101828;color:#fff;font-size:11px;padding:5px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;z-index:50}
+.tooltip-wrap:hover .tooltip-tip{opacity:1}
+
+/* Legend */
+.legend{display:flex;align-items:center;gap:14px;padding:10px 20px;border-bottom:1px solid #EAECF0;background:#FAFAFA}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#475467}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Stage filter bar — compact card pattern */
+.stage-filter-bar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid #EAECF0;background:#FAFBFF;flex-wrap:wrap}
+.stage-filter-label{font-size:11px;font-weight:600;color:#475467;white-space:nowrap;margin-right:4px}
+.stage-pill-filter{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid #EAECF0;background:#fff;color:#475467;transition:all 150ms ease;white-space:nowrap;box-shadow:0px 1px 2px 0px rgba(16,24,40,0.05)}
+.stage-pill-filter:hover{border-color:#004EEB;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.stage-pill-filter.active{border:2px solid #004EEB;color:#004EEB;background:#004EEB08;font-weight:600}
+.stage-pill-filter.all.active{border:2px solid #101828;background:#10182808;color:#101828}
+.stage-pill-filter .pill-count{font-size:13px;font-weight:700;color:inherit;line-height:1}
+tr.pj-hidden{display:none}
+
+/* Fulfilment % bar */
+.fulfil-cell{min-width:130px}
+.fulfil-row{display:flex;align-items:center;gap:8px}
+.fulfil-bar{flex:1;height:6px;background:#EAECF0;border-radius:999px;overflow:hidden}
+.fulfil-bar-fill{height:100%;border-radius:999px;background:#004EEB;transition:width .4s ease}
+.fulfil-bar-fill.done{background:#059669}
+.fulfil-pct{font-size:12px;font-weight:700;color:#344054;min-width:32px;text-align:right}
+.fulfil-pct.zero{color:#98A2B3;font-weight:500}
+.fulfil-pct.done{color:#059669}
+
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(16,24,40,.4);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:12px;width:540px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(16,24,40,.2)}
+.modal-hd{padding:18px 20px;border-bottom:1px solid #EAECF0;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-title{font-size:15px;font-weight:700}
+.modal-sub{font-size:12px;color:#667085;margin-top:2px}
+.modal-close{font-size:22px;color:#667085;cursor:pointer;border:none;background:none;line-height:1}
+.modal-body{flex:1;overflow-y:auto;padding:20px}
+.modal-ft{padding:14px 20px;border-top:1px solid #EAECF0;display:flex;justify-content:flex-end;gap:8px}
+
+/* Tag/status pill */
+.status-pill{padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600}
+.pill-running{background:#FFF4ED;color:#C4320A;border:1px solid #F9DBAF}
+.pill-placed{background:#EFF8FF;color:#004EEB;border:1px solid #B2DDFF}
+.pill-completed{background:#ECFDF3;color:#067647;border:1px solid #ABEFC6}
+.pill-printing{background:#FFFAEB;color:#B54708;border:1px solid #FEDF89}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-icon" title="Demand">📋</div>
+    <div class="sidebar-icon active" title="Work Orders">🏭</div>
+    <div class="sidebar-icon" title="Reports">📊</div>
+    <div class="sidebar-icon" title="Settings">⚙</div>
+  </div>
+
+  <div class="main-content">
+    <!-- Top nav -->
+    <div class="topnav">
+      <div class="breadcrumb">
+        <a onclick="showScreen('list')">Sticker Work Orders</a>
+        <span id="breadcrumb-detail" style="display:none">›</span>
+        <span id="breadcrumb-wo" style="display:none"></span>
+      </div>
+      <div class="topnav-right">
+        <div style="font-size:12px;color:#667085">TASMAC — PSP Portal</div>
+        <div class="avatar">ST</div>
+      </div>
+    </div>
+
+    <!-- Screen switcher (prototype nav) -->
+    <div class="page" style="padding-bottom:0;padding-top:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:11px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.06em">Prototype screens</div>
+        <div class="screen-switcher" style="margin-bottom:0">
+          <button class="screen-btn active" onclick="showScreen('list')">Screen 1 — Demand List</button>
+          <button class="screen-btn" onclick="showScreen('detail')">Screen 2 — Work Order Detail</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SCREEN 1: DEMAND LIST                        -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="screen active page" id="screen-list">
+      <div class="page-title">Sticker Work Orders</div>
+      <div class="page-sub">Track QR sticker demands from order to dispatch — print job traceability throughout.</div>
+
+      <div class="card">
+        <!-- Tabs -->
+        <div class="tabs">
+          <div class="tab active" onclick="switchListTab('placed',this)">Demand Placed <span class="tab-badge">15</span></div>
+          <div class="tab" onclick="switchListTab('inprogress',this)">In Progress Demands <span class="tab-badge">41</span></div>
+          <div class="tab" onclick="switchListTab('completed',this)">Fulfilled Demand <span class="tab-badge">5</span></div>
+          <div class="tab" onclick="switchListTab('tasmac',this)">Send to TASMAC <span class="tab-badge">5</span></div>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="filter-bar">
+          <div class="search-box">
+            <span style="color:#98A2B3;font-size:14px">⌕</span>
+            <input placeholder="Search demand ID or supplier…"/>
+          </div>
+          <div class="search-box" style="width:160px">
+            <span style="color:#98A2B3;font-size:14px">📅</span>
+            <input placeholder="Creation date"/>
+          </div>
+          <div class="search-box" style="width:160px">
+            <span style="color:#98A2B3;font-size:14px">📅</span>
+            <input placeholder="Production month"/>
+          </div>
+          <button class="btn btn-primary" style="margin-left:auto">+ Create Demand</button>
+        </div>
+
+        <!-- Tab panels -->
+        <div class="tab-panel active" id="list-placed">
+          <table>
+            <thead>
+              <tr>
+                <th>Demand ID</th>
+                <th>Supplier Name</th>
+                <th>Creation Date</th>
+                <th>Production Month</th>
+                <th style="text-align:right">QRs Ordered</th>
+                <th>Fulfilment</th>
+                <th style="text-align:right">QRs Printed</th>
+                <th style="text-align:right">QRs Verified</th>
+                <th style="text-align:right">QRs Packed</th>
+                <th style="text-align:right">QRs Dispatched</th>
+                <th>Days to Deadline</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-001</span></td>
+                <td>SAFL — IMFS (08777)</td>
+                <td style="color:#667085;font-size:12px">27-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">1,53,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-orange">100 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-002</span></td>
+                <td>ENRICA — IMFS (03777)</td>
+                <td style="color:#667085;font-size:12px">27-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">2,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-orange">100 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-003</span></td>
+                <td>ACCORD — IMFS (01777)</td>
+                <td style="color:#667085;font-size:12px">15-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">10</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-orange">100 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-004</span></td>
+                <td>ACCORD — IMFS (01777)</td>
+                <td style="color:#667085;font-size:12px">15-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">100</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-orange">100 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-005</span></td>
+                <td>ACCORD — IMFS (01777)</td>
+                <td style="color:#667085;font-size:12px">15-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">200</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-warning">93 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-2026-006</span></td>
+                <td>ACCORD — IMFS (01777)</td>
+                <td style="color:#667085;font-size:12px">03-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">20</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:0%"></div></div><span class="fulfil-pct zero">0%</span></div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-error">2 days</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-panel" id="list-inprogress">
+          <table>
+            <thead>
+              <tr>
+                <th>Demand ID</th>
+                <th>Supplier Name</th>
+                <th>Creation Date</th>
+                <th>Production Month</th>
+                <th style="text-align:right">QRs Ordered</th>
+                <th>Fulfilment</th>
+                <th style="text-align:right">QRs Printed</th>
+                <th style="text-align:right">QRs Verified</th>
+                <th style="text-align:right">QRs Packed</th>
+                <th style="text-align:right">QRs Dispatched</th>
+                <th>Days to Deadline</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-ACC-001</span></td>
+                <td>ACCORD — IMFS (01777)</td>
+                <td style="color:#667085;font-size:12px">03-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">20,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:25%"></div></div><span class="fulfil-pct">25%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">15,000</span><div class="qr-sub">75%</div></td>
+                <td style="text-align:right"><span class="qr-col">10,000</span><div class="qr-sub">50%</div></td>
+                <td style="text-align:right"><span class="qr-col">5,000</span><div class="qr-sub">25%</div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-warning">2 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-SAF-002</span></td>
+                <td>SAFL — BREWERY (08777)</td>
+                <td style="color:#667085;font-size:12px">01-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">50,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:60%"></div></div><span class="fulfil-pct">60%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">50,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">45,000</span><div class="qr-sub">90%</div></td>
+                <td style="text-align:right"><span class="qr-col">45,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">30,000</span><div class="qr-sub">60%</div></td>
+                <td><span class="chip chip-success">15 days</span></td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-ENC-003</span></td>
+                <td>ENRICA — IMFS (03777)</td>
+                <td style="color:#667085;font-size:12px">05-Apr-2026</td>
+                <td style="color:#667085;font-size:12px">Apr-2026</td>
+                <td style="text-align:right"><span class="qr-col">12,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill" style="width:42%"></div></div><span class="fulfil-pct">42%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">12,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">8,000</span><div class="qr-sub">67%</div></td>
+                <td style="text-align:right"><span class="qr-col">6,000</span><div class="qr-sub">75%</div></td>
+                <td style="text-align:right"><span class="qr-col">5,000</span><div class="qr-sub">83%</div></td>
+                <td><span class="chip chip-orange">8 days</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-panel" id="list-completed">
+          <table>
+            <thead>
+              <tr>
+                <th>Demand ID</th>
+                <th>Supplier Name</th>
+                <th>Creation Date</th>
+                <th>Production Month</th>
+                <th style="text-align:right">QRs Ordered</th>
+                <th>Fulfilment</th>
+                <th style="text-align:right">QRs Printed</th>
+                <th style="text-align:right">QRs Verified</th>
+                <th style="text-align:right">QRs Packed</th>
+                <th style="text-align:right">QRs Dispatched</th>
+                <th>Dispatched On</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-GLD-011</span></td>
+                <td>Golden Vats — IMFS (07111)</td>
+                <td style="color:#667085;font-size:12px">10-Mar-2026</td>
+                <td style="color:#667085;font-size:12px">Mar-2026</td>
+                <td style="text-align:right"><span class="qr-col">80,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill done" style="width:100%"></div></div><span class="fulfil-pct done">100%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">80,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">78,400</span><div class="qr-sub">98%</div></td>
+                <td style="text-align:right"><span class="qr-col">78,400</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">80,000</span><div class="qr-sub">100%</div></td>
+                <td style="color:#667085;font-size:12px">02-Apr-2026</td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-KAL-012</span></td>
+                <td>Kals — BREWERY (05222)</td>
+                <td style="color:#667085;font-size:12px">08-Mar-2026</td>
+                <td style="color:#667085;font-size:12px">Mar-2026</td>
+                <td style="text-align:right"><span class="qr-col">35,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill done" style="width:100%"></div></div><span class="fulfil-pct done">100%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">35,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">34,972</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">34,972</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">35,000</span><div class="qr-sub">100%</div></td>
+                <td style="color:#667085;font-size:12px">28-Mar-2026</td>
+              </tr>
+              <tr onclick="showScreen('detail')">
+                <td><span class="link">DMD-SHV-013</span></td>
+                <td>Shiva — IMFS (09333)</td>
+                <td style="color:#667085;font-size:12px">12-Mar-2026</td>
+                <td style="color:#667085;font-size:12px">Mar-2026</td>
+                <td style="text-align:right"><span class="qr-col">1,20,000</span></td>
+                <td class="fulfil-cell"><div class="fulfil-row"><div class="fulfil-bar"><div class="fulfil-bar-fill done" style="width:100%"></div></div><span class="fulfil-pct done">100%</span></div></td>
+                <td style="text-align:right"><span class="qr-col">1,20,000</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">1,17,600</span><div class="qr-sub">98%</div></td>
+                <td style="text-align:right"><span class="qr-col">1,17,600</span><div class="qr-sub">100%</div></td>
+                <td style="text-align:right"><span class="qr-col">1,20,000</span><div class="qr-sub">100%</div></td>
+                <td style="color:#667085;font-size:12px">05-Apr-2026</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-panel" id="list-tasmac">
+          <div class="empty">
+            <div class="empty-icon">🚚</div>
+            <div class="empty-title">5 demands sent to TASMAC</div>
+            <div class="empty-sub">These demands have been fully dispatched and are awaiting TASMAC confirmation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Design note -->
+      <div style="margin-top:16px;padding:12px 16px;background:#F0F5FF;border:1px solid #B2DDFF;border-radius:8px;font-size:12px;color:#004EEB;line-height:1.6">
+        <strong>Design changes from current:</strong><br>
+        1. <strong>Status column removed</strong> — tab placement (Order Placed / In Progress / Completed) communicates status implicitly.<br>
+        2. <strong>QR funnel columns added</strong> (QRs Printed → Verified → Packed → Dispatched) so you can see progress without clicking in.<br>
+        3. <strong>Mini funnel bar</strong> on In Progress tab gives instant visual scan of where each demand stands.<br>
+        4. <strong>Days to Deadline</strong> uses colour-coded chips (red = overdue, amber = &lt;7 days, green = safe).
+      </div>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SCREEN 2: WORK ORDER DETAIL                  -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div class="screen page" id="screen-detail">
+
+      <!-- WO Header card -->
+      <div class="wo-header">
+        <div class="wo-topbar">
+          <button class="back-btn" onclick="showScreen('list')">‹ Back</button>
+          <div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="wo-id">DMD-ACC-001</span>
+              <span class="status-pill pill-running">Printing in progress</span>
+            </div>
+            <div style="font-size:12px;color:#667085;margin-top:2px">ACCORD — IMFS (01777) · Apr-2026 production · Deadline: 29-Apr-2026</div>
+          </div>
+          <div class="wo-tags" style="margin-left:auto">
+            <span style="font-size:12px;color:#667085">Supplier Code: <strong style="color:#344054">01777</strong></span>
+            <span style="font-size:12px;color:#667085;margin-left:12px">SKUs: <strong style="color:#344054">BREWERY, IMFS</strong></span>
+          </div>
+        </div>
+
+        <!-- QR Funnel strip -->
+        <div class="qr-funnel">
+          <div class="funnel-step">
+            <div class="fs-label">QRs Ordered</div>
+            <div class="fs-value">20,000</div>
+            <div class="fs-sub">1 demand</div>
+            <div class="fs-bar"><div class="fs-bar-fill fill-ordered" style="width:100%"></div></div>
+          </div>
+          <div class="funnel-step">
+            <div class="fs-label">QRs Printed</div>
+            <div class="fs-value" style="color:#004EEB">15,000</div>
+            <div class="fs-sub">75% of ordered · 4 PJs</div>
+            <div class="fs-bar"><div class="fs-bar-fill fill-printed" style="width:75%"></div></div>
+          </div>
+          <div class="funnel-step">
+            <div class="fs-label">QRs Verified</div>
+            <div class="fs-value" style="color:#6172F3">10,000</div>
+            <div class="fs-sub">67% of printed · VIS done</div>
+            <div class="fs-bar"><div class="fs-bar-fill fill-verified" style="width:67%"></div></div>
+          </div>
+          <div class="funnel-step">
+            <div class="fs-label">QRs Packed</div>
+            <div class="fs-value" style="color:#B54708">5,000</div>
+            <div class="fs-sub">50% of verified · 1 batch</div>
+            <div class="fs-bar"><div class="fs-bar-fill fill-packed" style="width:50%"></div></div>
+          </div>
+          <div class="funnel-step">
+            <div class="fs-label">QRs Dispatched</div>
+            <div class="fs-value" style="color:#12B76A">5,000</div>
+            <div class="fs-sub">100% of packed · DS-0035</div>
+            <div class="fs-bar"><div class="fs-bar-fill fill-dispatched" style="width:100%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Print Jobs — Primary view -->
+      <div class="pj-card">
+        <div class="pj-tabs tabs" style="padding:0 20px">
+          <div class="tab active" onclick="switchWoTab('printjobs',this)">Print Jobs <span class="tab-badge">4</span></div>
+          <div class="tab" onclick="switchWoTab('batches',this)">Batches <span class="tab-badge">1</span></div>
+          <div class="tab" onclick="switchWoTab('dispatches',this)">Dispatches <span class="tab-badge">0</span></div>
+        </div>
+
+        <!-- ── PRINT JOBS TAB (PRIMARY) ── -->
+        <div class="tab-panel active" id="wo-tab-printjobs">
+
+          <!-- Stage filter pills -->
+          <div class="stage-filter-bar">
+            <span class="stage-filter-label">Filter by stage:</span>
+            <button class="stage-pill-filter all active" onclick="filterByStage('all',this)">All <span class="pill-count">4</span></button>
+            <button class="stage-pill-filter" onclick="filterByStage('printing',this)">⟳ Printing <span class="pill-count">1</span></button>
+            <button class="stage-pill-filter" onclick="filterByStage('vis-override',this)">⚠ VIS Override <span class="pill-count">1</span></button>
+            <button class="stage-pill-filter" onclick="filterByStage('packed',this)">📦 Packed <span class="pill-count">1</span></button>
+            <button class="stage-pill-filter" onclick="filterByStage('dispatched',this)">✓ Dispatched <span class="pill-count">1</span></button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:32px"></th>
+                <th>Print Job ID</th>
+                <th>Created On</th>
+                <th>SKU</th>
+                <th style="text-align:right">QR Qty</th>
+                <th style="text-align:right">QRs Verified</th>
+                <th>Stage</th>
+                <th>Batch</th>
+                <th>Dispatch</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- PJ1: Packed, dispatched -->
+              <tr class="pj-row" data-stage="dispatched" onclick="togglePJRow('pj1-exp','pj1-chev')" style="cursor:pointer">
+                <td><span class="chev" id="pj1-chev">›</span></td>
+                <td><span class="link">PJ620</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
+                <td style="font-size:12px">IMFS</td>
+                <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right">
+                  <span style="font-weight:600;color:#067647">2,480</span>
+                  <div class="qr-sub">override applied</div>
+                </td>
+                <td><span class="chip chip-success">✓ Dispatched</span></td>
+                <td><span class="ref-id" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></td>
+                <td><span class="ref-id" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></td>
+              </tr>
+              <tr class="exp-row" id="pj1-exp" style="display:none">
+                <td colspan="9">
+                  <div class="exp-content">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap">
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">VIS Result</div>
+                        <div class="batch-ref-val" style="color:#067647">✓ Override applied</div>
+                        <div class="batch-ref-meta">Printed: 2,500 · Verified: 2,480 · Defected: 20</div>
+                      </div>
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">Batch</div>
+                        <div class="batch-ref-val" onclick="switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">BH-0070</div>
+                        <div class="batch-ref-meta">27 Apr 2026, 09:59 PM · 1 roll</div>
+                      </div>
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">Dispatch</div>
+                        <div class="batch-ref-val" onclick="openDispatchDetail()">DS-0035</div>
+                        <div class="batch-ref-meta">27 Apr 2026 10:11 PM · EWB 455667777777</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- PJ2: Packed, dispatched -->
+              <tr class="pj-row" data-stage="dispatched" onclick="togglePJRow('pj2-exp','pj2-chev')" style="cursor:pointer">
+                <td><span class="chev" id="pj2-chev">›</span></td>
+                <td><span class="link">PJ617</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
+                <td style="font-size:12px">IMFS</td>
+                <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right">
+                  <span style="font-weight:600;color:#067647">2,500</span>
+                  <div class="qr-sub">clean · no defects</div>
+                </td>
+                <td><span class="chip chip-success">✓ Dispatched</span></td>
+                <td><span class="ref-id" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></td>
+                <td><span class="ref-id" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></td>
+              </tr>
+              <tr class="exp-row" id="pj2-exp" style="display:none">
+                <td colspan="9">
+                  <div class="exp-content">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap">
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">VIS Result</div>
+                        <div class="batch-ref-val" style="color:#067647">✓ Verified — 2,500 / 2,500</div>
+                        <div class="batch-ref-meta">No defects · clean job</div>
+                      </div>
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">Batch</div>
+                        <div class="batch-ref-val" onclick="switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">BH-0070</div>
+                        <div class="batch-ref-meta">27 Apr 2026, 09:59 PM · 1 roll</div>
+                      </div>
+                      <div class="batch-ref-block">
+                        <div class="batch-ref-label">Dispatch</div>
+                        <div class="batch-ref-val" onclick="openDispatchDetail()">DS-0035</div>
+                        <div class="batch-ref-meta">27 Apr 2026 10:11 PM · EWB 455667777777</div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- PJ3: Printing in progress -->
+              <tr class="pj-row" data-stage="printing" onclick="togglePJRow('pj3-exp','pj3-chev')" style="cursor:pointer">
+                <td><span class="chev" id="pj3-chev">›</span></td>
+                <td><span class="link">PJ624</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
+                <td style="font-size:12px">BREWERY</td>
+                <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-warning">⟳ Printing</span></td>
+                <td><span class="ref-dash">—</span></td>
+                <td><span class="ref-dash">—</span></td>
+              </tr>
+              <tr class="exp-row" id="pj3-exp" style="display:none">
+                <td colspan="9">
+                  <div class="exp-content">
+                    <div class="inline-alert al-warn" style="max-width:420px">⟳ Print job is currently being executed at the facility. VIS will be triggered automatically once printing completes.</div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- PJ4: Printed, VIS defects found — override available -->
+              <tr class="pj-row" data-stage="vis-override" onclick="togglePJRow('pj4-exp','pj4-chev')" style="cursor:pointer">
+                <td><span class="chev" id="pj4-chev">›</span></td>
+                <td><span class="link">PJ623</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
+                <td style="font-size:12px">BREWERY</td>
+                <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right">
+                  <span style="font-weight:600;color:#D92D20">2,404</span>
+                  <div class="qr-sub" style="color:#D92D20">96 defects</div>
+                </td>
+                <td><span class="chip chip-error">⚠ VIS: Override Needed</span></td>
+                <td><span class="ref-dash">—</span></td>
+                <td><span class="ref-dash">—</span></td>
+              </tr>
+              <tr class="exp-row" id="pj4-exp" style="display:none">
+                <td colspan="9">
+                  <div class="exp-content">
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
+                      <div class="batch-ref-block" style="min-width:220px">
+                        <div class="batch-ref-label">VIS Result</div>
+                        <div class="batch-ref-val" style="color:#D92D20">Defects found</div>
+                        <div class="batch-ref-meta">Printed: 2,500 · Verified: 2,404 · Defected: 96</div>
+                      </div>
+                      <div style="flex:1;min-width:280px">
+                        <div class="inline-alert al-warn" style="margin-bottom:10px">⚠ VIS has flagged defective QRs. Override to proceed — defective QRs will be excluded and the remaining 2,404 verified QRs will be ready to pack.</div>
+                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation()">Override &amp; Mark Ready to Pack</button>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+          <div style="padding:10px 20px;font-size:11px;color:#98A2B3;border-top:1px solid #EAECF0;background:#FAFAFA">
+            Showing 4 print jobs · Use stage filter above to narrow view · Click any row to expand details · Batch and Dispatch IDs are clickable
+          </div>
+        </div>
+
+        <!-- ── BATCHES TAB ── -->
+        <div class="tab-panel" id="wo-tab-batches">
+          <div class="actbar">
+            <div class="actbar-left">1 batch created · select batch(es) to create a dispatch</div>
+            <div class="actbar-right">
+              <button class="btn btn-outlined btn-sm">+ Create Batch</button>
+              <button class="btn btn-primary btn-sm" disabled>Create Dispatch</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th style="width:36px"><input type="checkbox"></th>
+                <th>Batch ID</th>
+                <th>Created On</th>
+                <th>Print Jobs in Batch</th>
+                <th style="text-align:right">Rolls</th>
+                <th style="text-align:right">QRs in Batch</th>
+                <th>Dispatch</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" onchange="toggleDispatchBtn(this)"></td>
+                <td><span class="link" onclick="openBatchModal()">BH-0070</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026 09:59 PM</td>
+                <td>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap">
+                    <span class="chip chip-blue" style="font-size:10px">PJ620</span>
+                    <span class="chip chip-blue" style="font-size:10px">PJ617</span>
+                  </div>
+                </td>
+                <td style="text-align:right;font-weight:600">2</td>
+                <td style="text-align:right;font-weight:600">5,000</td>
+                <td><span class="chip chip-neutral">Not dispatched</span></td>
+                <td><button class="btn btn-outlined btn-sm" style="color:#D92D20;border-color:#FECACA;font-size:11px">🗑 Delete</button></td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 20px;font-size:11px;color:#98A2B3;border-top:1px solid #EAECF0;background:#FAFAFA">
+            Batch = a physical grouping of rolls from one or more print jobs. Select batch(es) to create a dispatch.
+          </div>
+        </div>
+
+        <!-- ── DISPATCHES TAB ── -->
+        <div class="tab-panel" id="wo-tab-dispatches">
+          <div class="actbar">
+            <div class="actbar-left" id="dispatches-actbar-label">1 dispatch · 5,000 QRs dispatched across 1 dispatch</div>
+            <div class="actbar-right">
+              <button class="btn btn-outlined btn-sm" onclick="switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">← Go to Batches</button>
+              <button class="btn btn-primary btn-sm" onclick="openCreateDispatch()">+ Create Dispatch</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Dispatch ID</th>
+                <th>Dispatched On</th>
+                <th>E-way Bill</th>
+                <th>Batches</th>
+                <th>Print Jobs (via batches)</th>
+                <th style="text-align:right">Rolls</th>
+                <th style="text-align:right">QRs Dispatched</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="link" onclick="openDispatchDetail()">DS-0035</span></td>
+                <td style="font-size:12px;color:#667085">27 Apr 2026 10:11 PM</td>
+                <td><span style="font-family:monospace;font-size:12px;background:#F2F4F7;padding:3px 8px;border-radius:4px;border:1px solid #EAECF0">455667777777</span></td>
+                <td>
+                  <span class="chip chip-blue" style="font-size:11px;cursor:pointer" onclick="openDispatchDetail()">📦 BH-0070</span>
+                </td>
+                <td>
+                  <div style="display:flex;gap:5px;flex-wrap:wrap">
+                    <span class="chip chip-neutral" style="font-size:10px">PJ625</span>
+                    <span class="chip chip-neutral" style="font-size:10px">PJ626</span>
+                  </div>
+                </td>
+                <td style="text-align:right;font-weight:600">2</td>
+                <td style="text-align:right;font-weight:600;color:#12B76A">5,000</td>
+              </tr>
+            </tbody>
+          </table>
+          <div style="padding:10px 20px;font-size:11px;color:#98A2B3;border-top:1px solid #EAECF0;background:#FAFAFA">
+            Print Jobs column shows all PJs included in this dispatch (via their batches) — click Dispatch ID to see full breakdown.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Design note -->
+      <div style="margin-top:16px;padding:12px 16px;background:#F0F5FF;border:1px solid #B2DDFF;border-radius:8px;font-size:12px;color:#004EEB;line-height:1.6">
+        <strong>Design changes from current:</strong><br>
+        1. <strong>QR Funnel corrected</strong> — now shows QRs Ordered → Printed → Verified → Packed → Dispatched (not "QRs in print jobs" and "QRs in batches" which obscure the real story).<br>
+        2. <strong>Print Job is the primary identifier</strong> — one flat table, all 4 PJs visible together with a live lifecycle timeline in each row.<br>
+        3. <strong>Batch ID and Dispatch ID are inline</strong> per print job — so you can trace PJ620 → BH-0070 → (no dispatch yet) in one row without switching tabs.<br>
+        4. <strong>Tabs reduced to 3</strong>: Print Jobs (primary) · Batches · Dispatches. "Jobs In Progress" merged into Print Jobs via lifecycle column so you never lose sight of a PJ.<br>
+        5. <strong>Expand row</strong> shows VIS detail, batch reference, and dispatch reference — all anchored to the Print Job identity.
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ══ BATCH DETAIL MODAL ══ -->
+<div class="overlay" id="batch-modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">Batch BH-0070</div>
+        <div class="modal-sub">Created 27 Apr 2026, 09:59 PM · 2 rolls · 5,000 QRs</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('batch-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <table>
+        <thead><tr><th>Print Job ID</th><th>SKU</th><th>Rolls in Batch</th><th style="text-align:right">QRs</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;color:#004EEB">PJ620</td><td>IMFS</td><td>1</td><td style="text-align:right">2,500</td></tr>
+          <tr><td style="font-weight:600;color:#004EEB">PJ617</td><td>IMFS</td><td>1</td><td style="text-align:right">2,500</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;padding:10px 14px;background:#F9FAFB;border:1px solid #EAECF0;border-radius:8px;display:flex;justify-content:space-between;font-size:12px">
+        <span>Total rolls</span><strong>2</strong>
+      </div>
+      <div style="padding:6px 14px;background:#F9FAFB;border:1px solid #EAECF0;border-radius:8px;display:flex;justify-content:space-between;font-size:12px;margin-top:4px">
+        <span>Total QRs</span><strong style="color:#004EEB">5,000</strong>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-outlined" onclick="closeModal('batch-modal')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('batch-modal');openCreateDispatch()">Create Dispatch with this batch →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CREATE DISPATCH MODAL ══ -->
+<div class="overlay" id="create-dispatch-modal">
+  <div class="modal" style="width:560px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">Create a dispatch</div>
+        <div class="modal-sub">Search and add batches, then enter an e-way bill to dispatch QRs to TASMAC.</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('create-dispatch-modal')">×</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:16px">
+
+      <!-- Batch search -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#344054;margin-bottom:6px">Search & add batches <span style="color:#D92D20">*</span></div>
+        <div style="display:flex;align-items:center;gap:8px;border:1px solid #D0D5DD;border-radius:8px;padding:0 12px;height:38px;background:#fff">
+          <span style="color:#98A2B3;font-size:14px">⌕</span>
+          <input style="border:none;outline:none;flex:1;font-size:13px;font-family:inherit" placeholder="BH-XXXX" oninput="filterBatches(this.value)" id="batch-search-input"/>
+          <span style="color:#98A2B3;font-size:14px">⌄</span>
+        </div>
+        <!-- Batch dropdown suggestions -->
+        <div id="batch-dropdown" style="border:1px solid #EAECF0;border-radius:8px;margin-top:4px;background:#fff;box-shadow:0 4px 12px rgba(16,24,40,.1);display:none">
+          <div style="padding:8px 12px;font-size:12px;color:#667085;border-bottom:1px solid #EAECF0">Ready to dispatch</div>
+          <div class="batch-option" onclick="addBatchChip('BH-0070')" style="padding:10px 12px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:600;color:#344054">BH-0070</span>
+            <span style="font-size:11px;color:#667085">2 rolls · 5,000 QRs · 27 Apr</span>
+          </div>
+        </div>
+        <!-- Selected batch chips -->
+        <div id="dispatch-batch-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+          <div style="display:inline-flex;align-items:center;gap:6px;background:#EFF8FF;border:1px solid #B2DDFF;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;color:#004EEB">
+            BH-0070 <span onclick="removeBatchChip('BH-0070')" style="cursor:pointer;color:#98A2B3;font-size:14px;line-height:1">×</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dispatch summary table -->
+      <div id="dispatch-summary-block">
+        <div style="border:1px solid #EAECF0;border-radius:8px;overflow:hidden">
+          <table style="margin:0">
+            <thead><tr style="background:#F9FAFB"><th>Batches</th><th>Rolls to dispatch</th><th>QRs to dispatch</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600">1</td><td>2</td><td style="font-weight:600;color:#004EEB">5,000</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Print Jobs breakdown (design change: show PJs directly) -->
+        <div style="margin-top:10px;padding:10px 12px;background:#F9FAFB;border:1px solid #EAECF0;border-radius:8px">
+          <div style="font-size:11px;font-weight:600;color:#475467;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Print Jobs included in this dispatch</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="chip chip-neutral" style="font-size:11px">PJ620 · 2,500 QRs</span>
+            <span class="chip chip-neutral" style="font-size:11px">PJ617 · 2,500 QRs</span>
+          </div>
+          <div style="font-size:10px;color:#98A2B3;margin-top:6px">via BH-0070</div>
+        </div>
+      </div>
+
+      <!-- E-way bill -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#344054;margin-bottom:6px">E-way bill number <span style="color:#D92D20">*</span></div>
+        <input id="ewb-input" type="text" style="width:100%;height:38px;border:1px solid #D0D5DD;border-radius:8px;padding:0 12px;font-family:inherit;font-size:13px;outline:none" placeholder="e.g. 455667777777" oninput="checkCreateDispatch()"/>
+        <div style="font-size:11px;color:#667085;margin-top:4px">Required to enable dispatch.</div>
+      </div>
+
+      <!-- Upload e-way bill -->
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#344054;margin-bottom:6px">Upload E-way bill (optional)</div>
+        <div style="display:flex;align-items:center;gap:0;border:1px solid #D0D5DD;border-radius:8px;overflow:hidden">
+          <div style="flex:1;padding:0 12px;height:38px;display:flex;align-items:center;font-size:12px;color:#98A2B3;background:#fff">No file chosen</div>
+          <button class="btn btn-outlined" style="border-radius:0;border-left:1px solid #D0D5DD;height:38px;border-top:none;border-bottom:none;border-right:none;font-size:12px" onclick="simulateUpload()">⬆ Upload</button>
+        </div>
+        <div style="font-size:10px;color:#98A2B3;margin-top:4px">Only PDF file supported (Max 10 MB)</div>
+      </div>
+
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-outlined" onclick="closeModal('create-dispatch-modal')">Cancel</button>
+      <button id="create-dispatch-submit" class="btn btn-primary" disabled onclick="submitDispatch()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DISPATCH DETAIL MODAL (redesigned: PJs shown directly) ══ -->
+<div class="overlay" id="dispatch-detail-modal">
+  <div class="modal" style="width:640px">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title">Dispatch details (DS-0035)</div>
+        <div class="modal-sub">27 Apr 2026, 10:11 PM · E-way bill: 455667777777 · 2 rolls · 5,000 QRs</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('dispatch-detail-modal')">×</button>
+    </div>
+    <div class="modal-body" style="padding:0">
+
+      <!-- Design note callout -->
+      <div style="padding:10px 16px;background:#F0F5FF;border-bottom:1px solid #B2DDFF;font-size:11px;color:#004EEB">
+        ✦ <strong>Redesigned view:</strong> Print Jobs are shown directly — no need to click through Batch → PJs to trace a job.
+      </div>
+
+      <!-- Summary strip -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid #EAECF0">
+        <div style="padding:14px 16px;border-right:1px solid #EAECF0">
+          <div style="font-size:10px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Batches</div>
+          <div style="font-size:18px;font-weight:700">1</div>
+          <div style="font-size:11px;color:#667085">BH-0070</div>
+        </div>
+        <div style="padding:14px 16px;border-right:1px solid #EAECF0">
+          <div style="font-size:10px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Print Jobs</div>
+          <div style="font-size:18px;font-weight:700;color:#004EEB">2</div>
+          <div style="font-size:11px;color:#667085">PJ625 · PJ626</div>
+        </div>
+        <div style="padding:14px 16px;border-right:1px solid #EAECF0">
+          <div style="font-size:10px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Rolls dispatched</div>
+          <div style="font-size:18px;font-weight:700">2</div>
+        </div>
+        <div style="padding:14px 16px">
+          <div style="font-size:10px;font-weight:600;color:#667085;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">QRs dispatched</div>
+          <div style="font-size:18px;font-weight:700;color:#12B76A">5,000</div>
+        </div>
+      </div>
+
+      <!-- Print Jobs table — primary view -->
+      <div style="padding:14px 16px 0;font-size:11px;font-weight:600;color:#475467;text-transform:uppercase;letter-spacing:.04em">Print Jobs in this dispatch</div>
+      <table style="margin:0">
+        <thead>
+          <tr>
+            <th>Print Job ID</th>
+            <th>SKU</th>
+            <th>Batch</th>
+            <th style="text-align:right">Rolls</th>
+            <th style="text-align:right">QRs</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;color:#004EEB">PJ625</td>
+            <td style="font-size:12px">BREWERY</td>
+            <td><span class="chip chip-blue" style="font-size:10px">BH-0070</span></td>
+            <td style="text-align:right">1</td>
+            <td style="text-align:right;font-weight:600">2,500</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;color:#004EEB">PJ626</td>
+            <td style="font-size:12px">BREWERY</td>
+            <td><span class="chip chip-blue" style="font-size:10px">BH-0070</span></td>
+            <td style="text-align:right">1</td>
+            <td style="text-align:right;font-weight:600">2,500</td>
+          </tr>
+          <tr style="background:#F9FAFB">
+            <td colspan="3" style="font-weight:600;font-size:12px">Total</td>
+            <td style="text-align:right;font-weight:700">2</td>
+            <td style="text-align:right;font-weight:700;color:#12B76A">5,000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-outlined" onclick="closeModal('dispatch-detail-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Screen switching ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.screen-btn');
+  if (id === 'list') {
+    btns[0].classList.add('active');
+    document.getElementById('breadcrumb-detail').style.display = 'none';
+    document.getElementById('breadcrumb-wo').style.display = 'none';
+  } else {
+    btns[1].classList.add('active');
+    document.getElementById('breadcrumb-detail').style.display = 'inline';
+    document.getElementById('breadcrumb-wo').style.display = 'inline';
+    document.getElementById('breadcrumb-wo').textContent = 'DMD-ACC-001';
+  }
+}
+
+// ── List tabs ──
+function switchListTab(id, el) {
+  document.querySelectorAll('#screen-list .tabs .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#screen-list .tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('list-' + id).classList.add('active');
+}
+
+// ── WO detail tabs ──
+function switchWoTab(id, el) {
+  document.querySelectorAll('.pj-card .tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pj-card .tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('wo-tab-' + id).classList.add('active');
+}
+
+// ── Expand print job row ──
+function togglePJRow(rowId, chevId) {
+  const row = document.getElementById(rowId);
+  const chev = document.getElementById(chevId);
+  const visible = row.style.display !== 'none';
+  row.style.display = visible ? 'none' : 'table-row';
+  chev.classList.toggle('open', !visible);
+}
+
+// ── Toggle dispatch button when batch checkbox selected ──
+function toggleDispatchBtn(cb) {
+  const btn = document.querySelector('#wo-tab-batches .btn-primary');
+  btn.disabled = !cb.checked;
+}
+
+// ── Generic modal open/close ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// Close overlay on backdrop click
+document.querySelectorAll('.overlay').forEach(ov => {
+  ov.addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('open');
+  });
+});
+
+// ── Batch detail modal ──
+function openBatchModal() { openModal('batch-modal'); }
+
+// ── Create Dispatch modal ──
+function openCreateDispatch() {
+  document.getElementById('ewb-input').value = '';
+  document.getElementById('create-dispatch-submit').disabled = true;
+  openModal('create-dispatch-modal');
+}
+
+function filterBatches(val) {
+  const dd = document.getElementById('batch-dropdown');
+  dd.style.display = val.length > 0 ? 'block' : 'none';
+}
+
+function addBatchChip(batchId) {
+  document.getElementById('batch-dropdown').style.display = 'none';
+  document.getElementById('batch-search-input').value = '';
+}
+
+function removeBatchChip(batchId) {
+  // In prototype: just hide the chip container for demo
+  document.getElementById('dispatch-batch-chips').innerHTML =
+    '<span style="font-size:12px;color:#98A2B3">No batches selected — search above.</span>';
+  document.getElementById('dispatch-summary-block').style.display = 'none';
+  document.getElementById('create-dispatch-submit').disabled = true;
+}
+
+function checkCreateDispatch() {
+  const val = document.getElementById('ewb-input').value.trim();
+  document.getElementById('create-dispatch-submit').disabled = val.length < 6;
+}
+
+function submitDispatch() {
+  closeModal('create-dispatch-modal');
+  // Switch to dispatches tab to show result
+  switchWoTab('dispatches', document.querySelectorAll('.pj-card .tab')[2]);
+  setTimeout(() => {
+    // Update funnel to show dispatched = 5,000
+    document.querySelector('.fill-dispatched').style.width = '25%';
+    // Flash the dispatch tab badge
+    const badge = document.querySelectorAll('.pj-card .tab')[2].querySelector('.tab-badge');
+    if (badge) { badge.style.background = '#ECFDF3'; badge.style.color = '#067647'; badge.style.borderColor = '#ABEFC6'; }
+  }, 300);
+}
+
+function simulateUpload() {
+  event.target.closest('div').querySelector('div').textContent = '✅ EwayBill.pdf uploaded (1.2 MB)';
+}
+
+// ── Dispatch detail modal ──
+function openDispatchDetail() { openModal('dispatch-detail-modal'); }
+
+// ── Stage filter ──
+function filterByStage(stage, el) {
+  document.querySelectorAll('.stage-pill-filter').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const rows = document.querySelectorAll('.pj-row');
+  let visible = 0;
+  rows.forEach(row => {
+    const expId = row.id ? row.id.replace('pj','pj').replace('-row','') : null;
+    const match = stage === 'all' || row.dataset.stage === stage;
+    // Show/hide data row
+    row.classList.toggle('pj-hidden', !match);
+    // Show/hide its expand row (next sibling)
+    const exp = row.nextElementSibling;
+    if (exp && exp.classList.contains('exp-row')) {
+      if (!match) exp.style.display = 'none';
+    }
+    if (match) visible++;
+  });
+  // Update "All (N)" label
+  const allBtn = document.querySelector('.stage-pill-filter.all');
+  allBtn.innerHTML = `All <span class="pill-count">${stage === 'all' ? visible : 4}</span>`;
+}
+</script>
+</body>
+</html>
