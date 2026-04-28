@@ -233,6 +233,12 @@ tr.row-hidden{display:none}
 .col-filter-opt.sel{color:#004EEB;font-weight:500;background:#EFF8FF}
 .col-filter-opt.sel::before{content:'✓ ';font-size:11px}
 
+/* Filter sub-row below column headers */
+tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAECF0;font-weight:400;text-transform:none;letter-spacing:0;height:auto}
+.col-search,.col-select{width:100%;height:28px;border:1px solid #D0D5DD;border-radius:6px;padding:0 8px;font-size:11px;font-family:inherit;color:#344054;background:#fff;box-sizing:border-box}
+.col-search:focus,.col-select:focus{outline:none;border-color:#004EEB}
+.col-select{padding:0 6px;cursor:pointer}
+
 /* Fulfilment % bar */
 .fulfil-cell{min-width:130px}
 .fulfil-row{display:flex;align-items:center;gap:8px}
@@ -333,13 +339,13 @@ tr.row-hidden{display:none}
 
         <!-- Tab panels -->
         <div class="tab-panel active" id="list-placed">
-          <table>
+          <div style="overflow-x:auto"><table style="min-width:900px">
             <thead>
               <tr>
                 <th>Demand ID</th>
-                <th><div class="th-inner">Supplier Name<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-p-sup-btn" onclick="toggleColFilter('cf-p-sup-dd',event)">▾</button><div class="col-filter-dd" id="cf-p-sup-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('supplier','all','cf-p-sup-dd','cf-p-sup-btn')">All suppliers</div><div class="col-filter-opt" data-val="SAFL" onclick="applyDemandFilter('supplier','SAFL','cf-p-sup-dd','cf-p-sup-btn')">SAFL</div><div class="col-filter-opt" data-val="ENRICA" onclick="applyDemandFilter('supplier','ENRICA','cf-p-sup-dd','cf-p-sup-btn')">ENRICA</div><div class="col-filter-opt" data-val="ACCORD" onclick="applyDemandFilter('supplier','ACCORD','cf-p-sup-dd','cf-p-sup-btn')">ACCORD</div></div></div></div></th>
+                <th>Supplier Name</th>
                 <th>Creation Date</th>
-                <th><div class="th-inner">Production Month<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-p-mon-btn" onclick="toggleColFilter('cf-p-mon-dd',event)">▾</button><div class="col-filter-dd" id="cf-p-mon-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('month','all','cf-p-mon-dd','cf-p-mon-btn')">All months</div><div class="col-filter-opt" data-val="Apr-2026" onclick="applyDemandFilter('month','Apr-2026','cf-p-mon-dd','cf-p-mon-btn')">Apr-2026</div></div></div></div></th>
+                <th>Production Month</th>
                 <th style="text-align:right">QRs Ordered</th>
                 <th>Fulfilment</th>
                 <th style="text-align:right">QRs Printed</th>
@@ -347,6 +353,13 @@ tr.row-hidden{display:none}
                 <th style="text-align:right">QRs Packed</th>
                 <th style="text-align:right">QRs Dispatched</th>
                 <th>Days to Deadline</th>
+              </tr>
+              <tr class="hd-filter">
+                <th><input class="col-search" placeholder="Search ID…" oninput="filterDemandRows('search',this.value)"></th>
+                <th><input class="col-search" placeholder="Supplier…" oninput="filterDemandRows('supplier',this.value)"></th>
+                <th></th>
+                <th><select class="col-select" onchange="filterDemandRows('month',this.value)"><option value="">All months</option><option value="Apr-2026">Apr-2026</option></select></th>
+                <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -429,17 +442,17 @@ tr.row-hidden{display:none}
                 <td><span class="chip chip-error">2 days</span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
 
         <div class="tab-panel" id="list-inprogress">
-          <table>
+          <div style="overflow-x:auto"><table style="min-width:900px">
             <thead>
               <tr>
                 <th>Demand ID</th>
-                <th><div class="th-inner">Supplier Name<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-i-sup-btn" onclick="toggleColFilter('cf-i-sup-dd',event)">▾</button><div class="col-filter-dd" id="cf-i-sup-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('supplier','all','cf-i-sup-dd','cf-i-sup-btn')">All suppliers</div><div class="col-filter-opt" data-val="ACCORD" onclick="applyDemandFilter('supplier','ACCORD','cf-i-sup-dd','cf-i-sup-btn')">ACCORD</div><div class="col-filter-opt" data-val="SAFL" onclick="applyDemandFilter('supplier','SAFL','cf-i-sup-dd','cf-i-sup-btn')">SAFL</div><div class="col-filter-opt" data-val="ENRICA" onclick="applyDemandFilter('supplier','ENRICA','cf-i-sup-dd','cf-i-sup-btn')">ENRICA</div></div></div></div></th>
+                <th>Supplier Name</th>
                 <th>Creation Date</th>
-                <th><div class="th-inner">Production Month<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-i-mon-btn" onclick="toggleColFilter('cf-i-mon-dd',event)">▾</button><div class="col-filter-dd" id="cf-i-mon-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('month','all','cf-i-mon-dd','cf-i-mon-btn')">All months</div><div class="col-filter-opt" data-val="Apr-2026" onclick="applyDemandFilter('month','Apr-2026','cf-i-mon-dd','cf-i-mon-btn')">Apr-2026</div></div></div></div></th>
+                <th>Production Month</th>
                 <th style="text-align:right">QRs Ordered</th>
                 <th>Fulfilment</th>
                 <th style="text-align:right">QRs Printed</th>
@@ -447,6 +460,13 @@ tr.row-hidden{display:none}
                 <th style="text-align:right">QRs Packed</th>
                 <th style="text-align:right">QRs Dispatched</th>
                 <th>Days to Deadline</th>
+              </tr>
+              <tr class="hd-filter">
+                <th><input class="col-search" placeholder="Search ID…" oninput="filterDemandRows('search',this.value)"></th>
+                <th><input class="col-search" placeholder="Supplier…" oninput="filterDemandRows('supplier',this.value)"></th>
+                <th></th>
+                <th><select class="col-select" onchange="filterDemandRows('month',this.value)"><option value="">All months</option><option value="Apr-2026">Apr-2026</option></select></th>
+                <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -490,17 +510,17 @@ tr.row-hidden{display:none}
                 <td><span class="chip chip-orange">8 days</span></td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
 
         <div class="tab-panel" id="list-completed">
-          <table>
+          <div style="overflow-x:auto"><table style="min-width:900px">
             <thead>
               <tr>
                 <th>Demand ID</th>
-                <th><div class="th-inner">Supplier Name<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-c-sup-btn" onclick="toggleColFilter('cf-c-sup-dd',event)">▾</button><div class="col-filter-dd" id="cf-c-sup-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('supplier','all','cf-c-sup-dd','cf-c-sup-btn')">All suppliers</div><div class="col-filter-opt" data-val="Golden Vats" onclick="applyDemandFilter('supplier','Golden Vats','cf-c-sup-dd','cf-c-sup-btn')">Golden Vats</div><div class="col-filter-opt" data-val="Kals" onclick="applyDemandFilter('supplier','Kals','cf-c-sup-dd','cf-c-sup-btn')">Kals</div><div class="col-filter-opt" data-val="Shiva" onclick="applyDemandFilter('supplier','Shiva','cf-c-sup-dd','cf-c-sup-btn')">Shiva</div></div></div></div></th>
+                <th>Supplier Name</th>
                 <th>Creation Date</th>
-                <th><div class="th-inner">Production Month<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-c-mon-btn" onclick="toggleColFilter('cf-c-mon-dd',event)">▾</button><div class="col-filter-dd" id="cf-c-mon-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyDemandFilter('month','all','cf-c-mon-dd','cf-c-mon-btn')">All months</div><div class="col-filter-opt" data-val="Mar-2026" onclick="applyDemandFilter('month','Mar-2026','cf-c-mon-dd','cf-c-mon-btn')">Mar-2026</div></div></div></div></th>
+                <th>Production Month</th>
                 <th style="text-align:right">QRs Ordered</th>
                 <th>Fulfilment</th>
                 <th style="text-align:right">QRs Printed</th>
@@ -508,6 +528,13 @@ tr.row-hidden{display:none}
                 <th style="text-align:right">QRs Packed</th>
                 <th style="text-align:right">QRs Dispatched</th>
                 <th>Dispatched On</th>
+              </tr>
+              <tr class="hd-filter">
+                <th><input class="col-search" placeholder="Search ID…" oninput="filterDemandRows('search',this.value)"></th>
+                <th><input class="col-search" placeholder="Supplier…" oninput="filterDemandRows('supplier',this.value)"></th>
+                <th></th>
+                <th><select class="col-select" onchange="filterDemandRows('month',this.value)"><option value="">All months</option><option value="Mar-2026">Mar-2026</option></select></th>
+                <th></th><th></th><th></th><th></th><th></th><th></th><th></th>
               </tr>
             </thead>
             <tbody>
@@ -551,7 +578,7 @@ tr.row-hidden{display:none}
                 <td style="color:#667085;font-size:12px">05-Apr-2026</td>
               </tr>
             </tbody>
-          </table>
+          </table></div>
         </div>
 
         <div class="tab-panel" id="list-tasmac">
@@ -641,8 +668,8 @@ tr.row-hidden{display:none}
 
         <!-- ── PRINT JOBS TAB (PRIMARY) ── -->
         <div class="tab-panel active" id="wo-tab-printjobs">
-
-          <table>
+          <div style="overflow-x:auto">
+          <table style="min-width:980px">
             <thead>
               <tr>
                 <th style="width:32px"></th>
@@ -651,128 +678,88 @@ tr.row-hidden{display:none}
                 <th>SKU</th>
                 <th style="text-align:right">QR Qty</th>
                 <th style="text-align:right">QRs Verified</th>
-                <th><div class="th-inner">Stage<div class="col-filter-wrap"><button class="col-filter-btn" id="cf-stage-btn" onclick="toggleColFilter('cf-stage-dd',event)">▾</button><div class="col-filter-dd" id="cf-stage-dd"><div class="col-filter-opt sel" data-val="all" onclick="applyStageFilter('all')">All stages</div><div class="col-filter-opt" data-val="order-placed" onclick="applyStageFilter('order-placed')">Order Placed</div><div class="col-filter-opt" data-val="printed" onclick="applyStageFilter('printed')">Printed</div><div class="col-filter-opt" data-val="vis-verified" onclick="applyStageFilter('vis-verified')">VIS Verified</div><div class="col-filter-opt" data-val="packed" onclick="applyStageFilter('packed')">Packed</div><div class="col-filter-opt" data-val="dispatched" onclick="applyStageFilter('dispatched')">Dispatched</div></div></div></div></th>
-                <th>Batch</th>
-                <th>Dispatch</th>
+                <th style="text-align:right">QR Defects</th>
+                <th style="text-align:right">QRs Packed</th>
+                <th style="text-align:right">QRs Dispatched</th>
+                <th>Stage</th>
+              </tr>
+              <tr class="hd-filter">
+                <th></th>
+                <th><input class="col-search" placeholder="Search PJ ID…" oninput="filterPJRows('search',this.value)"></th>
+                <th></th>
+                <th><select class="col-select" onchange="filterPJRows('sku',this.value)"><option value="">All SKUs</option><option value="IMFS">IMFS</option><option value="BREWERY">BREWERY</option></select></th>
+                <th></th><th></th><th></th><th></th><th></th>
+                <th><select class="col-select" onchange="filterPJRows('stage',this.value)"><option value="">All stages</option><option value="order-placed">Order Placed</option><option value="printed">Printed</option><option value="vis-verified">VIS Verified</option><option value="packed">Packed</option><option value="dispatched">Dispatched</option></select></th>
               </tr>
             </thead>
             <tbody>
 
-              <!-- PJ1: Packed, dispatched -->
-              <tr class="pj-row" data-stage="dispatched" onclick="togglePJRow('pj1-exp','pj1-chev')" style="cursor:pointer">
+              <!-- PJ1: Dispatched, override applied -->
+              <tr class="pj-row" data-stage="dispatched" data-sku="IMFS" onclick="togglePJRow('pj1-exp','pj1-chev')" style="cursor:pointer">
                 <td><span class="chev" id="pj1-chev">›</span></td>
                 <td><span class="link">PJ620</span></td>
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">IMFS</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
-                <td style="text-align:right">
-                  <span style="font-weight:600;color:#067647">2,480</span>
-                  <div class="qr-sub">override applied</div>
-                </td>
+                <td style="text-align:right"><span style="font-weight:600;color:#059669">2,480</span><div class="qr-sub">99.2% yield</div></td>
+                <td style="text-align:right"><span style="font-weight:600;color:#DC2626">20</span><div class="qr-sub">Override applied</div></td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></div></td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></div></td>
                 <td><span class="chip chip-success">✓ Dispatched</span></td>
-                <td><span class="ref-id" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></td>
-                <td><span class="ref-id" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></td>
               </tr>
               <tr class="exp-row" id="pj1-exp" style="display:none">
-                <td colspan="9">
-                  <div class="exp-content">
-                    <div style="display:flex;gap:12px;flex-wrap:wrap">
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">VIS Result</div>
-                        <div class="batch-ref-val" style="color:#067647">✓ Override applied</div>
-                        <div class="batch-ref-meta">Printed: 2,500 · Verified: 2,480 · Defected: 20</div>
-                      </div>
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">Batch</div>
-                        <div class="batch-ref-val" onclick="switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">BH-0070</div>
-                        <div class="batch-ref-meta">27 Apr 2026, 09:59 PM · 1 roll</div>
-                      </div>
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">Dispatch</div>
-                        <div class="batch-ref-val" onclick="openDispatchDetail()">DS-0035</div>
-                        <div class="batch-ref-meta">27 Apr 2026 10:11 PM · EWB 455667777777</div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
+                <td colspan="10"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Override applied</div><div class="batch-ref-meta">Printed: 2,500 · Verified: 2,480 · Defected: 20</div></div></div></td>
               </tr>
 
-              <!-- PJ2: Packed, dispatched -->
-              <tr class="pj-row" data-stage="dispatched" onclick="togglePJRow('pj2-exp','pj2-chev')" style="cursor:pointer">
+              <!-- PJ2: Dispatched, clean -->
+              <tr class="pj-row" data-stage="dispatched" data-sku="IMFS" onclick="togglePJRow('pj2-exp','pj2-chev')" style="cursor:pointer">
                 <td><span class="chev" id="pj2-chev">›</span></td>
                 <td><span class="link">PJ617</span></td>
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">IMFS</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
-                <td style="text-align:right">
-                  <span style="font-weight:600;color:#067647">2,500</span>
-                  <div class="qr-sub">clean · no defects</div>
-                </td>
+                <td style="text-align:right"><span style="font-weight:600;color:#059669">2,500</span><div class="qr-sub">100% yield</div></td>
+                <td style="text-align:right"><span style="font-weight:600;color:#475467">0</span><div class="qr-sub">Clean · no defects</div></td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></div></td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></div></td>
                 <td><span class="chip chip-success">✓ Dispatched</span></td>
-                <td><span class="ref-id" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></td>
-                <td><span class="ref-id" onclick="event.stopPropagation();openDispatchDetail()">🚚 DS-0035</span></td>
               </tr>
               <tr class="exp-row" id="pj2-exp" style="display:none">
-                <td colspan="9">
-                  <div class="exp-content">
-                    <div style="display:flex;gap:12px;flex-wrap:wrap">
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">VIS Result</div>
-                        <div class="batch-ref-val" style="color:#067647">✓ Verified — 2,500 / 2,500</div>
-                        <div class="batch-ref-meta">No defects · clean job</div>
-                      </div>
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">Batch</div>
-                        <div class="batch-ref-val" onclick="switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">BH-0070</div>
-                        <div class="batch-ref-meta">27 Apr 2026, 09:59 PM · 1 roll</div>
-                      </div>
-                      <div class="batch-ref-block">
-                        <div class="batch-ref-label">Dispatch</div>
-                        <div class="batch-ref-val" onclick="openDispatchDetail()">DS-0035</div>
-                        <div class="batch-ref-meta">27 Apr 2026 10:11 PM · EWB 455667777777</div>
-                      </div>
-                    </div>
-                  </div>
-                </td>
+                <td colspan="10"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Verified — 2,500 / 2,500</div><div class="batch-ref-meta">No defects · clean job</div></div></div></td>
               </tr>
 
-              <!-- PJ3: Order Placed (printing in progress) -->
-              <tr class="pj-row" data-stage="order-placed" onclick="togglePJRow('pj3-exp','pj3-chev')" style="cursor:pointer">
+              <!-- PJ3: Order Placed -->
+              <tr class="pj-row" data-stage="order-placed" data-sku="BREWERY" onclick="togglePJRow('pj3-exp','pj3-chev')" style="cursor:pointer">
                 <td><span class="chev" id="pj3-chev">›</span></td>
                 <td><span class="link">PJ624</span></td>
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">BREWERY</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
                 <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
                 <td><span class="chip chip-neutral">Order Placed</span></td>
-                <td><span class="ref-dash">—</span></td>
-                <td><span class="ref-dash">—</span></td>
               </tr>
               <tr class="exp-row" id="pj3-exp" style="display:none">
-                <td colspan="9">
-                  <div class="exp-content">
-                    <div class="inline-alert al-neu" style="max-width:420px">Print job created and queued. Printing is in progress at the facility — VIS upload will be available once printing completes.</div>
-                  </div>
-                </td>
+                <td colspan="10"><div class="exp-content"><div class="inline-alert al-neu" style="max-width:460px">Print job created and queued. Printing is in progress at the facility — VIS upload will be available once printing completes.</div></div></td>
               </tr>
 
-              <!-- PJ4: Printed, VIS defects found — override available -->
-              <tr class="pj-row" data-stage="printed" onclick="togglePJRow('pj4-exp','pj4-chev')" style="cursor:pointer">
+              <!-- PJ4: Printed, VIS defects — override pending -->
+              <tr class="pj-row" data-stage="printed" data-sku="BREWERY" onclick="togglePJRow('pj4-exp','pj4-chev')" style="cursor:pointer">
                 <td><span class="chev" id="pj4-chev">›</span></td>
                 <td><span class="link">PJ623</span></td>
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">BREWERY</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
-                <td style="text-align:right">
-                  <span style="font-weight:600;color:#DC2626">2,404</span>
-                  <div class="qr-sub" style="color:#DC2626">96 defects</div>
-                </td>
+                <td style="text-align:right"><span style="font-weight:600;color:#DC2626">2,404</span><div class="qr-sub">96.2% yield</div></td>
+                <td style="text-align:right"><span style="font-weight:600;color:#DC2626">96</span><div class="qr-sub" style="color:#DC2626">Override pending</div></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
                 <td><span class="chip chip-warning">⚠ Printed</span></td>
-                <td><span class="ref-dash">—</span></td>
-                <td><span class="ref-dash">—</span></td>
               </tr>
               <tr class="exp-row" id="pj4-exp" style="display:none">
-                <td colspan="9">
+                <td colspan="10">
                   <div class="exp-content">
                     <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
                       <div class="batch-ref-block" style="min-width:220px">
@@ -781,7 +768,7 @@ tr.row-hidden{display:none}
                         <div class="batch-ref-meta">Printed: 2,500 · Verified: 2,404 · Defected: 96</div>
                       </div>
                       <div style="flex:1;min-width:280px">
-                        <div class="inline-alert al-warn" style="margin-bottom:10px">⚠ VIS has flagged 96 defective QRs. Apply override to mark this job as VIS Verified — defective QRs will be excluded.</div>
+                        <div class="inline-alert al-warn" style="margin-bottom:10px">⚠ VIS flagged 96 defective QRs. Apply override to mark this job as VIS Verified — defective QRs will be excluded.</div>
                         <button class="btn btn-primary btn-sm" onclick="event.stopPropagation()">Apply Override</button>
                       </div>
                     </div>
@@ -791,8 +778,9 @@ tr.row-hidden{display:none}
 
             </tbody>
           </table>
+          </div>
           <div style="padding:10px 20px;font-size:11px;color:#98A2B3;border-top:1px solid #EAECF0;background:#FAFAFA">
-            Showing 4 print jobs · Filter by stage using the ▾ in the Stage column header · Click any row to expand details · Batch and Dispatch IDs are clickable
+            4 print jobs · Use column filters to narrow view · Click any row to expand VIS details · Batch and Dispatch IDs in Packed/Dispatched cells are clickable
           </div>
         </div>
 
@@ -1219,30 +1207,35 @@ function toggleColFilter(ddId, e) {
   document.getElementById(ddId).classList.toggle('open');
 }
 
-// ── Column header filter: Stage (Screen 2) ──
-function applyStageFilter(val) {
-  const dd = document.getElementById('cf-stage-dd');
-  const btn = document.getElementById('cf-stage-btn');
-  dd.querySelectorAll('.col-filter-opt').forEach(o => o.classList.toggle('sel', o.dataset.val === val));
-  btn.classList.toggle('has-filter', val !== 'all');
-  dd.classList.remove('open');
+// ── Column filter: Print Jobs rows (Screen 2) ──
+function filterPJRows(field, val) {
   document.querySelectorAll('.pj-row').forEach(row => {
-    const match = val === 'all' || row.dataset.stage === val;
+    let match = true;
+    if (field === 'stage') match = !val || row.dataset.stage === val;
+    else if (field === 'sku') match = !val || row.dataset.sku === val;
+    else if (field === 'search') {
+      const id = row.querySelector('.link')?.textContent.toLowerCase() || '';
+      match = !val || id.includes(val.toLowerCase());
+    }
     row.classList.toggle('pj-hidden', !match);
     const exp = row.nextElementSibling;
-    if (exp && exp.classList.contains('exp-row') && !match) exp.style.display = 'none';
+    if (exp?.classList.contains('exp-row') && !match) exp.style.display = 'none';
   });
 }
 
-// ── Column header filter: Demand rows (Screen 1) ──
-function applyDemandFilter(type, val, ddId, btnId) {
-  const dd = document.getElementById(ddId);
-  const btn = document.getElementById(btnId);
-  dd.querySelectorAll('.col-filter-opt').forEach(o => o.classList.toggle('sel', o.dataset.val === val));
-  btn.classList.toggle('has-filter', val !== 'all');
-  dd.classList.remove('open');
+// ── Column filter: Demand rows (Screen 1) ──
+function filterDemandRows(field, val) {
   document.querySelectorAll('.tab-panel.active tr.demand-row').forEach(row => {
-    const match = val === 'all' || row.dataset[type] === val;
+    let match = true;
+    if (field === 'search') {
+      const id = row.querySelector('.link')?.textContent.toLowerCase() || '';
+      match = !val || id.includes(val.toLowerCase());
+    } else if (field === 'supplier') {
+      const sup = (row.dataset.supplier || '').toLowerCase();
+      match = !val || sup.includes(val.toLowerCase());
+    } else if (field === 'month') {
+      match = !val || row.dataset.month === val;
+    }
     row.classList.toggle('row-hidden', !match);
   });
 }
