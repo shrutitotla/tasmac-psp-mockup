@@ -613,7 +613,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
           <div>
             <div style="display:flex;align-items:center;gap:8px">
               <span class="wo-id">DMD-ACC-001</span>
-              <span class="status-pill pill-running">Printing in progress</span>
+              <span class="status-pill pill-running">In Progress</span>
             </div>
             <div style="font-size:12px;color:#667085;margin-top:2px">ACCORD — IMFS (01777) · Apr-2026 production · Deadline: 29-Apr-2026</div>
           </div>
@@ -677,6 +677,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <th>Created On</th>
                 <th>SKU</th>
                 <th style="text-align:right">QR Qty</th>
+                <th style="text-align:right">QRs Printed</th>
                 <th style="text-align:right">QRs Verified</th>
                 <th style="text-align:right">QR Defects</th>
                 <th style="text-align:right">QRs Packed</th>
@@ -688,8 +689,8 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <th><input class="col-search" placeholder="Search PJ ID…" oninput="filterPJRows('search',this.value)"></th>
                 <th></th>
                 <th><select class="col-select" onchange="filterPJRows('sku',this.value)"><option value="">All SKUs</option><option value="IMFS">IMFS</option><option value="BREWERY">BREWERY</option></select></th>
-                <th></th><th></th><th></th><th></th><th></th>
-                <th><select class="col-select" onchange="filterPJRows('stage',this.value)"><option value="">All stages</option><option value="order-placed">Order Placed</option><option value="printed">Printed</option><option value="vis-verified">VIS Verified</option><option value="packed">Packed</option><option value="dispatched">Dispatched</option></select></th>
+                <th></th><th></th><th></th><th></th><th></th><th></th>
+                <th><select class="col-select" onchange="filterPJRows('stage',this.value)"><option value="">All stages</option><option value="pj-created">PJ Created</option><option value="printed">Printed</option><option value="verified">Verified</option><option value="packed">Packed</option><option value="dispatched">Dispatched</option></select></th>
               </tr>
             </thead>
             <tbody>
@@ -701,6 +702,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">IMFS</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub">100%</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#059669">2,480</span><div class="qr-sub">99.2% yield</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#DC2626">20</span><div class="qr-sub">Override applied</div></td>
                 <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></div></td>
@@ -708,7 +710,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td><span class="chip chip-success">✓ Dispatched</span></td>
               </tr>
               <tr class="exp-row" id="pj1-exp" style="display:none">
-                <td colspan="10"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Override applied</div><div class="batch-ref-meta">Printed: 2,500 · Verified: 2,480 · Defected: 20</div></div></div></td>
+                <td colspan="11"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Override applied</div><div class="batch-ref-meta">Printed: 2,500 · Verified: 2,480 · Defected: 20</div></div></div></td>
               </tr>
 
               <!-- PJ2: Dispatched, clean -->
@@ -718,6 +720,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">IMFS</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub">100%</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#059669">2,500</span><div class="qr-sub">100% yield</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#475467">0</span><div class="qr-sub">Clean · no defects</div></td>
                 <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub"><span class="ref-id" style="font-size:10px;padding:2px 6px" onclick="event.stopPropagation();switchWoTab('batches', document.querySelectorAll('.pj-card .tab')[1])">📦 BH-0070</span></div></td>
@@ -725,11 +728,11 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td><span class="chip chip-success">✓ Dispatched</span></td>
               </tr>
               <tr class="exp-row" id="pj2-exp" style="display:none">
-                <td colspan="10"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Verified — 2,500 / 2,500</div><div class="batch-ref-meta">No defects · clean job</div></div></div></td>
+                <td colspan="11"><div class="exp-content"><div class="batch-ref-block"><div class="batch-ref-label">VIS Result</div><div class="batch-ref-val" style="color:#059669">✓ Verified — 2,500 / 2,500</div><div class="batch-ref-meta">No defects · clean job</div></div></div></td>
               </tr>
 
-              <!-- PJ3: Order Placed -->
-              <tr class="pj-row" data-stage="order-placed" data-sku="BREWERY" onclick="togglePJRow('pj3-exp','pj3-chev')" style="cursor:pointer">
+              <!-- PJ3: PJ Created (printing in progress) -->
+              <tr class="pj-row" data-stage="pj-created" data-sku="BREWERY" onclick="togglePJRow('pj3-exp','pj3-chev')" style="cursor:pointer">
                 <td><span class="chev" id="pj3-chev">›</span></td>
                 <td><span class="link">PJ624</span></td>
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
@@ -739,10 +742,11 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td style="text-align:right"><span class="ref-dash">—</span></td>
                 <td style="text-align:right"><span class="ref-dash">—</span></td>
                 <td style="text-align:right"><span class="ref-dash">—</span></td>
-                <td><span class="chip chip-neutral">Order Placed</span></td>
+                <td style="text-align:right"><span class="ref-dash">—</span></td>
+                <td><span class="chip chip-neutral">PJ Created</span></td>
               </tr>
               <tr class="exp-row" id="pj3-exp" style="display:none">
-                <td colspan="10"><div class="exp-content"><div class="inline-alert al-neu" style="max-width:460px">Print job created and queued. Printing is in progress at the facility — VIS upload will be available once printing completes.</div></div></td>
+                <td colspan="11"><div class="exp-content"><div class="inline-alert al-neu" style="max-width:460px">Print job created and queued. Printing is in progress at the facility — VIS upload will be available once printing completes.</div></div></td>
               </tr>
 
               <!-- PJ4: Printed, VIS defects — override pending -->
@@ -752,6 +756,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td style="font-size:12px;color:#667085">27 Apr 2026<br>05:05 PM</td>
                 <td style="font-size:12px">BREWERY</td>
                 <td style="text-align:right;font-weight:600">2,500</td>
+                <td style="text-align:right"><span style="font-weight:600">2,500</span><div class="qr-sub">100%</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#DC2626">2,404</span><div class="qr-sub">96.2% yield</div></td>
                 <td style="text-align:right"><span style="font-weight:600;color:#DC2626">96</span><div class="qr-sub" style="color:#DC2626">Override pending</div></td>
                 <td style="text-align:right"><span class="ref-dash">—</span></td>
@@ -759,7 +764,7 @@ tr.hd-filter th{padding:5px 8px;background:#F9FAFB;border-bottom:2px solid #EAEC
                 <td><span class="chip chip-warning">⚠ Printed</span></td>
               </tr>
               <tr class="exp-row" id="pj4-exp" style="display:none">
-                <td colspan="10">
+                <td colspan="11">
                   <div class="exp-content">
                     <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start">
                       <div class="batch-ref-block" style="min-width:220px">
